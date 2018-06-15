@@ -1,8 +1,6 @@
-# scrapy-HousePricing
+# WebofScience-Scrapy
 
-[HousePricing](https://github.com/PENGZhaoqing/HousePricing)的子项目，目的是实现对房价网站中的基本信息进行抓取
-
-使用了轻量级Scrapy框架，抓取后的数据存为json格式，然后由HousePricing进行解析并储存在数据库中
+爬取WebofScience网站中17年所有中科院发表的论文信息
 
 ## 安装
 
@@ -10,15 +8,19 @@
 
 ## 使用
 
-在终端中运行：
 
-```
-git clone https://github.com/PENGZhaoqing/scrapy-HousePricing
-cd scrapy-HousePricing
-scrapy crawl anjuke
-```
+1. 进入WebofScience网站，在高级搜索中填入AD=Chinese Acad Sci，选取年份2017-2017，然后点击查询，在下面会有一个查询结果
+2. 进入查询结果，复制URL，然后替换WebofScience/science.py中的start_url
+3. 在终端中运行：`scrapy crawl science `
 
-### 抓取数据文件
+若希望爬虫设置断点，以便下次继续爬取，请执行：`scrpy crawl science -s JOBDIR=WebofScience/backup/sciencespider`
 
-抓取的数据可以在根目录下的`housedata.json`查看
+
+### 数据文件
+
+抓取的数据可以在根目录下的`papers.json`查看
+
+## To do
+
+将爬虫用Web API封装，提供爬虫的网页界面，降低使用门槛
 
