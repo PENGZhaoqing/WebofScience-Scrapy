@@ -1,14 +1,12 @@
-from scrapy.selector import Selector
 from bs4 import BeautifulSoup
 
 try:
     from scrapy.spiders import Spider
 except:
     from scrapy.spiders import BaseSpider as Spider
-
 from scrapy.spiders import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor as sle
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+from scrapy.crawler import CrawlerProcess
+from scrapy.linkextractors import LinkExtractor
 from WebofScience.items import PaperDataItem
 import re
 import os
@@ -17,9 +15,12 @@ import json
 
 print os.getcwd()
 endpoint = set()
+import logging
+
+logging.getLogger('WebofScience').setLevel(logging.WARNING)
 
 try:
-    file = open('papers.json', 'r')
+    file = open('/Users/PENG-mac/Desktop/WebofScience-Scrapy/papers.json', 'r')
     for line in file:
         line = ast.literal_eval(line)
         endpoint.add(line['title'])
@@ -33,11 +34,11 @@ class PaperSpider(CrawlSpider):
     allowed_domains = ["apps.webofknowledge.com"]
 
     start_urls = [
-        "http://apps.webofknowledge.com/summary.do;jsessionid=A9D618BE59DD93A1B8225931330AF5E4?product=UA&doc=1&qid=1&SID=5Afv1eg5hfB1pJv7Owq&search_mode=AdvancedSearch&update_back2search_link_param=yes"
+        "http://apps.webofknowledge.com/full_record.do?product=UA&search_mode=AdvancedSearch&qid=4620&SID=6AWJoGGGrjr9v4XCAPl&page=1&doc=1"
     ]
 
     rules = [
-        Rule(SgmlLinkExtractor(allow=(r'.*page=\d+&doc=\d+.*')), follow=True, callback='parse_page')
+        Rule(LinkExtractor(allow=(r'.*page=\d+&doc=\d+.*')), follow=True, callback='parse_page')
     ]
 
     def parse_page(self, response):
@@ -84,12 +85,12 @@ class PaperSpider(CrawlSpider):
         try:
             addr_tables = body.find_all("table", "FR_table_noborders")
             if len(addr_tables) > 0:
-                for addr in addr_tables[0].select('td.fr_address_row2'):
-                    correspond_addrs.append(addr.get_text().replace('\n', ''))
+                for addr in addr_tables[-1].select('td.fr_address_row2'):
+                    addrs.append(addr.get_text().replace('\n', ''))
 
             if len(addr_tables) > 1:
-                for addr in addr_tables[1].select('td.fr_address_row2'):
-                    addrs.append(addr.get_text().replace('\n', ''))
+                for addr in addr_tables[0].select('td.fr_address_row2'):
+                    correspond_addrs.append(addr.get_text().replace('\n', ''))
         except:
             pass
 
@@ -104,3 +105,13 @@ class PaperSpider(CrawlSpider):
         item['ISSN'] = ISSN
         endpoint.add(title)
         yield item
+
+
+if __name__ == '__main__':
+    process = CrawlerProcess()
+    process.crawl(PaperSpider)
+    process.crawl(PaperSpider)
+    process.crawl(PaperSpider)
+    process.crawl(PaperSpider)
+    process.crawl(PaperSpider)
+    process.start()
