@@ -20,7 +20,7 @@ import logging
 logging.getLogger('WebofScience').setLevel(logging.WARNING)
 
 try:
-    file = open('/Users/PENG-mac/Desktop/WebofScience-Scrapy/papers.json', 'r')
+    file = open('papers.json', 'r')
     for line in file:
         line = ast.literal_eval(line)
         endpoint.add(line['title'])
@@ -34,7 +34,7 @@ class PaperSpider(CrawlSpider):
     allowed_domains = ["apps.webofknowledge.com"]
 
     start_urls = [
-        "http://apps.webofknowledge.com/full_record.do?product=UA&search_mode=AdvancedSearch&qid=4620&SID=6AWJoGGGrjr9v4XCAPl&page=1&doc=1"
+        "http://apps.webofknowledge.com/full_record.do?product=UA&search_mode=AdvancedSearch&qid=4620&SID=6AWJoGGGrjr9v4XCAPl&excludeEventConfig=ExcludeIfFromFullRecPage&page=1&doc=11391"
     ]
 
     rules = [
